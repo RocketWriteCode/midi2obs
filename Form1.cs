@@ -96,5 +96,26 @@ namespace midi2obs
                 BindingList.Items.AddRange(newContent);
             }
         }
+
+        private void removeBindingToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (BindingList.SelectedItems.Count <= 0) return;
+            foreach(ListViewItem item in BindingList.SelectedItems)
+            {
+                List<midiEventBinding> toDelete = new List<midiEventBinding>();
+                foreach(midiEventBinding bind in bindings)
+                {
+                    if (bind.name == item.Text)
+                    {
+                        toDelete.Add(bind);
+                    }
+                }
+                foreach(midiEventBinding bind in toDelete)
+                {
+                    bindings.Remove(bind);
+                }
+            }
+            UpdateBindingListView();
+        }
     }
 }

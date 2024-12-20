@@ -87,7 +87,7 @@ namespace midi2obs
             this.addBindingToolStripMenuItem,
             this.removeBindingToolStripMenuItem});
             this.BindingContextMenu.Name = "contextMenuStrip1";
-            this.BindingContextMenu.Size = new System.Drawing.Size(162, 48);
+            this.BindingContextMenu.Size = new System.Drawing.Size(181, 70);
             // 
             // addBindingToolStripMenuItem
             // 
@@ -101,6 +101,7 @@ namespace midi2obs
             this.removeBindingToolStripMenuItem.Name = "removeBindingToolStripMenuItem";
             this.removeBindingToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.removeBindingToolStripMenuItem.Text = "Remove Binding";
+            this.removeBindingToolStripMenuItem.Click += new System.EventHandler(this.removeBindingToolStripMenuItem_Click);
             // 
             // Form1
             // 
