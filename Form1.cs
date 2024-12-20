@@ -9,40 +9,77 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Melanchall.DryWetMidi.Multimedia;
 using Melanchall.DryWetMidi.Core;
+using OBSWebsocketDotNet;
+using OBSWebsocketDotNet.Types;
 
 namespace midi2obs
 {
     public partial class Form1 : Form
     {
         IInputDevice inputDevice;
+
+        OBSWebsocket obsSocket;
+
+        string pass = "testpass";
+
+        private delegate void SafeCallDelegateBool(bool value);
+        private delegate void SafeCallDelegateText(string text);
+
         public Form1()
         {
+            Console.WriteLine("Program started");
             InitializeComponent();
 
             inputDevice = InputDevice.GetByIndex(0);
-            inputDevice.EventReceived += OnEventReceived;
+            inputDevice.EventReceived += OnMidiEventReceived;
             inputDevice.StartEventsListening();
 
-            /*
-            foreach(InputDevice inputDevice in InputDevice.GetAll())
+            obsSocket = new OBSWebsocket();
+
+            obsSocket.Connected += onConnect;
+            obsSocket.Disconnected += onDisconnect;
+        }
+
+        private void onConnect(object sender, EventArgs e)
+        {
+            Console.WriteLine("Websocket connected");
+            UpdateConnectCheckbox(true);
+        }
+
+        private void onDisconnect(object sender, OBSWebsocketDotNet.Communication.ObsDisconnectionInfo e)
+        {
+            Console.WriteLine("Websocket disconnected");
+            UpdateConnectCheckbox(false);
+        }
+
+        private void UpdateConnectCheckbox(bool value)
+        {
+            if (ConnectedCheckbox.InvokeRequired)
             {
-                inputDevice.EventReceived += OnEventReceived;
-                Console.WriteLine(inputDevice.Name);
+                var d = new SafeCallDelegateBool(UpdateConnectCheckbox);
+                connectButton.Invoke(d, new object[] { value });
             }
-            */
+            else
+            {
+                ConnectedCheckbox.Checked = value;
+            }
         }
 
-        private void textBox1_TextChanged(object sender, EventArgs e)
+        private void UpdateNoteFeedback(string text)
         {
-
+            if(NoteFeedback.InvokeRequired)
+            {
+                SafeCallDelegateText del = new SafeCallDelegateText(UpdateNoteFeedback);
+                NoteFeedback.Invoke(del, new object[] { text });
+            }
+            else
+            {
+                NoteFeedback.Text = text;
+            }
         }
 
-        // ...
-
-        private void OnEventReceived(object sender, MidiEventReceivedEventArgs e)
+        private void OnMidiEventReceived(object sender, MidiEventReceivedEventArgs e)
         {
-            MidiDevice midiDevice = (MidiDevice)sender;
-
             string eventContent = e.Event.ToString();
 
             if (eventContent.Contains("Timing")) return;
@@ -63,13 +100,44 @@ namespace midi2obs
 
             if (velocity == 0) return;
 
-            Console.WriteLine($"Event: {note}, {velocity}");
+            UpdateNoteFeedback(note.ToString());
         }
 
         private void OnEventSent(object sender, MidiEventSentEventArgs e)
         {
             MidiDevice midiDevice = (MidiDevice)sender;
             Console.WriteLine($"Event sent to '{midiDevice.Name}' at {DateTime.Now}: {e.Event}");
+        }
+
+        private void connectButton_Click(object sender, EventArgs e)
+        {
+            if (!obsSocket.IsConnected)
+            {
+                System.Threading.Tasks.Task.Run(() =>
+                {
+                    try
+                    {
+                        obsSocket.ConnectAsync("ws://192.168.212.41:4455", pass);
+                    }
+                    catch (Exception ex)
+                    {
+                        BeginInvoke((MethodInvoker)delegate
+                        {
+                            MessageBox.Show("Connect failed : " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                            return;
+                        });
+                    }
+                });
+            }
+            else
+            {
+                obsSocket.Disconnect();
+            }
+        }
+
+        private void ConnectedCheckbox_CheckedChanged(object sender, EventArgs e)
+        {
+            UpdateConnectCheckbox(obsSocket.IsConnected);
         }
     }
 }
