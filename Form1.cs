@@ -16,14 +16,13 @@ namespace midi2obs
 {
     public partial class Form1 : Form
     {
-        IInputDevice inputDevice;
-
         string pass = "testpass";
 
         private delegate void SafeCallDelegateBool(bool value);
         private delegate void SafeCallDelegateText(string text);
 
         OBSHandler obsHandler;
+        MidiHandler midiHandler;
 
         public Form1()
         {
@@ -31,10 +30,8 @@ namespace midi2obs
             InitializeComponent();
 
             obsHandler = new OBSHandler(this);
-
-            inputDevice = InputDevice.GetByIndex(0);
-            inputDevice.EventReceived += OnMidiEventReceived;
-            inputDevice.StartEventsListening();
+            midiHandler = new MidiHandler(this);
+            
         }        
 
         public void UpdateConnectCheckbox(bool value)
@@ -50,7 +47,7 @@ namespace midi2obs
             }
         }
 
-        private void UpdateNoteFeedback(string text)
+        public void UpdateNoteFeedback(string text)
         {
             if(NoteFeedback.InvokeRequired)
             {
@@ -61,37 +58,6 @@ namespace midi2obs
             {
                 NoteFeedback.Text = text;
             }
-        }
-
-        private void OnMidiEventReceived(object sender, MidiEventReceivedEventArgs e)
-        {
-            string eventContent = e.Event.ToString();
-
-            if (eventContent.Contains("Timing")) return;
-            if (eventContent.Contains("Aftertouch")) return;
-
-            string[] splitString = eventContent.Split('(');
-            string cleanedString = splitString[1].Remove(splitString[1].Length - 1);
-            string[] values = cleanedString.Split(',');
-            string[] cleanedValues = new string[values.Length];
-            
-            for(int i = 0; i < values.Length; i++)
-            {
-                cleanedValues[i] = values[i].Trim();
-            }
-
-            int note = int.Parse(cleanedValues[0]);
-            int velocity = int.Parse(cleanedValues[1]);
-
-            if (velocity == 0) return;
-
-            UpdateNoteFeedback(note.ToString());
-        }
-
-        private void OnEventSent(object sender, MidiEventSentEventArgs e)
-        {
-            MidiDevice midiDevice = (MidiDevice)sender;
-            Console.WriteLine($"Event sent to '{midiDevice.Name}' at {DateTime.Now}: {e.Event}");
         }
 
         private void connectButton_Click(object sender, EventArgs e)
