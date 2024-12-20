@@ -18,41 +18,26 @@ namespace midi2obs
     {
         IInputDevice inputDevice;
 
-        OBSWebsocket obsSocket;
-
         string pass = "testpass";
 
         private delegate void SafeCallDelegateBool(bool value);
         private delegate void SafeCallDelegateText(string text);
+
+        OBSHandler obsHandler;
 
         public Form1()
         {
             Console.WriteLine("Program started");
             InitializeComponent();
 
+            obsHandler = new OBSHandler(this);
+
             inputDevice = InputDevice.GetByIndex(0);
             inputDevice.EventReceived += OnMidiEventReceived;
             inputDevice.StartEventsListening();
+        }        
 
-            obsSocket = new OBSWebsocket();
-
-            obsSocket.Connected += onConnect;
-            obsSocket.Disconnected += onDisconnect;
-        }
-
-        private void onConnect(object sender, EventArgs e)
-        {
-            Console.WriteLine("Websocket connected");
-            UpdateConnectCheckbox(true);
-        }
-
-        private void onDisconnect(object sender, OBSWebsocketDotNet.Communication.ObsDisconnectionInfo e)
-        {
-            Console.WriteLine("Websocket disconnected");
-            UpdateConnectCheckbox(false);
-        }
-
-        private void UpdateConnectCheckbox(bool value)
+        public void UpdateConnectCheckbox(bool value)
         {
             if (ConnectedCheckbox.InvokeRequired)
             {
@@ -111,33 +96,12 @@ namespace midi2obs
 
         private void connectButton_Click(object sender, EventArgs e)
         {
-            if (!obsSocket.IsConnected)
-            {
-                System.Threading.Tasks.Task.Run(() =>
-                {
-                    try
-                    {
-                        obsSocket.ConnectAsync("ws://192.168.212.41:4455", pass);
-                    }
-                    catch (Exception ex)
-                    {
-                        BeginInvoke((MethodInvoker)delegate
-                        {
-                            MessageBox.Show("Connect failed : " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                            return;
-                        });
-                    }
-                });
-            }
-            else
-            {
-                obsSocket.Disconnect();
-            }
+            obsHandler.Connect(pass);
         }
 
         private void ConnectedCheckbox_CheckedChanged(object sender, EventArgs e)
         {
-            UpdateConnectCheckbox(obsSocket.IsConnected);
+            UpdateConnectCheckbox(obsHandler.obsSocket.IsConnected);
         }
     }
 }
