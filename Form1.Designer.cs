@@ -29,9 +29,15 @@ namespace midi2obs
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.connectButton = new System.Windows.Forms.Button();
             this.ConnectedCheckbox = new System.Windows.Forms.CheckBox();
             this.NoteFeedback = new System.Windows.Forms.Label();
+            this.BindingList = new System.Windows.Forms.ListView();
+            this.BindingContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.addBindingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.removeBindingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.BindingContextMenu.SuspendLayout();
             this.SuspendLayout();
             // 
             // connectButton
@@ -64,16 +70,48 @@ namespace midi2obs
             this.NoteFeedback.TabIndex = 3;
             this.NoteFeedback.Text = "Note";
             // 
+            // BindingList
+            // 
+            this.BindingList.ContextMenuStrip = this.BindingContextMenu;
+            this.BindingList.HideSelection = false;
+            this.BindingList.Location = new System.Drawing.Point(12, 54);
+            this.BindingList.Name = "BindingList";
+            this.BindingList.Size = new System.Drawing.Size(185, 384);
+            this.BindingList.TabIndex = 4;
+            this.BindingList.UseCompatibleStateImageBehavior = false;
+            // 
+            // BindingContextMenu
+            // 
+            this.BindingContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.addBindingToolStripMenuItem,
+            this.removeBindingToolStripMenuItem});
+            this.BindingContextMenu.Name = "contextMenuStrip1";
+            this.BindingContextMenu.Size = new System.Drawing.Size(181, 70);
+            // 
+            // addBindingToolStripMenuItem
+            // 
+            this.addBindingToolStripMenuItem.Name = "addBindingToolStripMenuItem";
+            this.addBindingToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.addBindingToolStripMenuItem.Text = "Add Binding";
+            // 
+            // removeBindingToolStripMenuItem
+            // 
+            this.removeBindingToolStripMenuItem.Name = "removeBindingToolStripMenuItem";
+            this.removeBindingToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.removeBindingToolStripMenuItem.Text = "Remove Binding";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.BindingList);
             this.Controls.Add(this.NoteFeedback);
             this.Controls.Add(this.ConnectedCheckbox);
             this.Controls.Add(this.connectButton);
             this.Name = "Form1";
             this.Text = "Form1";
+            this.BindingContextMenu.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -83,6 +121,10 @@ namespace midi2obs
         private System.Windows.Forms.Button connectButton;
         private System.Windows.Forms.CheckBox ConnectedCheckbox;
         private System.Windows.Forms.Label NoteFeedback;
+        private System.Windows.Forms.ListView BindingList;
+        private System.Windows.Forms.ContextMenuStrip BindingContextMenu;
+        private System.Windows.Forms.ToolStripMenuItem addBindingToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem removeBindingToolStripMenuItem;
     }
 }
 
