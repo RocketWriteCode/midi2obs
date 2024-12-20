@@ -79,6 +79,7 @@ namespace midi2obs
             this.BindingList.Size = new System.Drawing.Size(185, 384);
             this.BindingList.TabIndex = 4;
             this.BindingList.UseCompatibleStateImageBehavior = false;
+            this.BindingList.View = System.Windows.Forms.View.List;
             // 
             // BindingContextMenu
             // 
@@ -86,13 +87,14 @@ namespace midi2obs
             this.addBindingToolStripMenuItem,
             this.removeBindingToolStripMenuItem});
             this.BindingContextMenu.Name = "contextMenuStrip1";
-            this.BindingContextMenu.Size = new System.Drawing.Size(181, 70);
+            this.BindingContextMenu.Size = new System.Drawing.Size(162, 48);
             // 
             // addBindingToolStripMenuItem
             // 
             this.addBindingToolStripMenuItem.Name = "addBindingToolStripMenuItem";
             this.addBindingToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.addBindingToolStripMenuItem.Text = "Add Binding";
+            this.addBindingToolStripMenuItem.Click += new System.EventHandler(this.addBindingToolStripMenuItem_Click);
             // 
             // removeBindingToolStripMenuItem
             // 

@@ -20,9 +20,12 @@ namespace midi2obs
 
         private delegate void SafeCallDelegateBool(bool value);
         private delegate void SafeCallDelegateText(string text);
+        private delegate void SafeCallDelegateVoid();
 
         OBSHandler obsHandler;
         MidiHandler midiHandler;
+
+        List<midiEventBinding> bindings = new List<midiEventBinding>();
 
         public Form1()
         {
@@ -31,7 +34,6 @@ namespace midi2obs
 
             obsHandler = new OBSHandler(this);
             midiHandler = new MidiHandler(this);
-            
         }        
 
         public void UpdateConnectCheckbox(bool value)
@@ -68,6 +70,31 @@ namespace midi2obs
         private void ConnectedCheckbox_CheckedChanged(object sender, EventArgs e)
         {
             UpdateConnectCheckbox(obsHandler.obsSocket.IsConnected);
+        }
+
+        private void addBindingToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            bindings.Add(new midiEventBinding("new binding", 0, "effect", "parameters"));
+            UpdateBindingListView();
+        }
+
+        private void UpdateBindingListView()
+        {
+            if (BindingList.InvokeRequired)
+            {
+                SafeCallDelegateVoid del = new SafeCallDelegateVoid(UpdateBindingListView);
+                BindingList.Invoke(del, new object[] {});
+            }
+            else
+            {
+                BindingList.Items.Clear();
+                ListViewItem[] newContent = new ListViewItem[bindings.Count];
+                for(int i = 0; i < bindings.Count; i++)
+                {
+                    newContent[i] = new ListViewItem(bindings[i].name);
+                }
+                BindingList.Items.AddRange(newContent);
+            }
         }
     }
 }
